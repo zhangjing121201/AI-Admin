@@ -12,9 +12,12 @@ export const usePermissionStore = defineStore('permission', {
     whiteListRouters: [
       '/login',
       '/home',
-      '/ai/list',
-      '/configuration/IMPromptWord',
-      '/configuration/dynamicPromptWord',
+      '/imPromptWord',
+      '/dynamicPromptWord',
+      '/apiConfiguration',
+      // '/ai/list',
+      // '/configuration/IMPromptWord',
+      // '/configuration/dynamicPromptWord',
       '/comment/idPool',
       '/comment/accountList',
     ], // 白名单路由

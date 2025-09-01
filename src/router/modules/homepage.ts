@@ -11,8 +11,8 @@ export default [
     name: 'homepage',
     meta: {
       title: {
-        zh_CN: '首页',
-        en_US: 'Home',
+        zh_CN: 'AI列表',
+        en_US: 'AIList',
       },
       icon: shallowRef(HomeIcon),
       orderNo: 0,
@@ -21,8 +21,8 @@ export default [
     children: [
       {
         path: '',
-        name: 'HomeBase',
-        component: () => import('@/pages/home/index.vue'),
+        name: 'aiList',
+        component: () => import('@/pages/ai/index.vue'),
         meta: {},
       },
     ],

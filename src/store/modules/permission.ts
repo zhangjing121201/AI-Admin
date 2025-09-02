@@ -15,9 +15,6 @@ export const usePermissionStore = defineStore('permission', {
       '/imPromptWord',
       '/dynamicPromptWord',
       '/apiConfiguration',
-      // '/ai/list',
-      // '/configuration/IMPromptWord',
-      // '/configuration/dynamicPromptWord',
       '/comment/idPool',
       '/comment/accountList',
     ], // 白名单路由

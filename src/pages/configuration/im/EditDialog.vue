@@ -20,7 +20,7 @@
       <t-form-item label="回复提示词" name="name">
         <t-input v-model="data.name" placeholder="输入回复提示词" />
       </t-form-item>
-      <t-form-item label="历史范围{history}" name="name">
+      <t-form-item label="历史范围" name="name">
         <t-input v-model="data.name" placeholder="输入历史范围" />
       </t-form-item>
       <t-form-item label="查询周期" name="name">

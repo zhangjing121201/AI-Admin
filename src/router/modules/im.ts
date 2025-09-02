@@ -4,7 +4,6 @@ export default [
   {
     path: '/imPromptWord',
     component: Layout,
-    // redirect: '/home',
     name: 'im',
     meta: {
       title: 'IM提示词',

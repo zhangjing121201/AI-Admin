@@ -16,7 +16,9 @@
       </template>
       <menu-content :nav-data="menu" />
       <template #operations>
-        <span :class="versionCls"> {{ !collapsed ? 'TDesign Starter' : '' }} {{ pgk.version }} </span>
+        <span :class="versionCls">
+          {{ !collapsed ? 'TDesign Starter' : '' }} {{ pgk.version }}
+        </span>
       </template>
     </t-menu>
     <div :class="`${prefix}-side-nav-placeholder${collapsed ? '-hidden' : ''}`"></div>
@@ -85,13 +87,13 @@ watch(
     const path = getActive();
     const parentPath = path.substring(0, path.lastIndexOf('/'));
     expanded.value = menuAutoCollapsed.value ? [parentPath] : union([parentPath], expanded.value);
-  },
+  }
 );
 
 const onExpanded = (value: MenuValue[]) => {
   const currentOperationMenu = difference(expanded.value, value);
   const allExpanded = union(value, expanded.value);
-  remove(allExpanded, (item) => currentOperationMenu.includes(item));
+  remove(allExpanded, item => currentOperationMenu.includes(item));
   expanded.value = allExpanded;
 };
 

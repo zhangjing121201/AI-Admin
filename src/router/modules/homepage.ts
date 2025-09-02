@@ -10,10 +10,7 @@ export default [
     redirect: '/home',
     name: 'homepage',
     meta: {
-      title: {
-        zh_CN: 'AI列表',
-        en_US: 'AIList',
-      },
+      title: 'AI列表',
       icon: shallowRef(HomeIcon),
       orderNo: 0,
       single: true,

@@ -19,19 +19,32 @@
           <t-button theme="primary" @click="handleQuery"> 查询 </t-button>
           <t-button theme="default" @click="handleReset"> 重置 </t-button>
         </t-col>
-        <input ref="fileInputRef" type="file" style="display: none" @change="handleFileChange" />
+        <!-- <input ref="fileInputRef" type="file" style="display: none" @change="handleFileChange" /> -->
       </t-row>
     </t-form>
     <t-row :style="{ marginTop: 'var(--td-comp-margin-xxl)' }">
       <t-button theme="primary" @click="handleCreate"> 新建 </t-button>
       <t-button theme="primary" @click="handleImport"> 导入 </t-button>
-      <input ref="fileInputRef" type="file" style="display: none" @change="handleFileChange" />
+      <t-button theme="primary" @click="submitData" v-if="importedData.length">提交到后台</t-button>
+      <input
+        ref="fileInputRef"
+        type="file"
+        style="display: none"
+        @change="handleFileChange"
+        accept=".xlsx,.xls"
+      />
     </t-row>
     <div class="table-container">
-      <t-table hover :data="tableData" :columns="COLUMNS" row-key="id" :pagination="pagination">
-        <template #operation="{ row }">
+      <t-table
+        hover
+        :data="tableData.concat(importedData)"
+        :columns="COLUMNS"
+        row-key="id"
+        :pagination="pagination"
+      >
+        <template #operation="{ row, rowIndex }">
           <t-space>
-            <t-link theme="primary" @click="handleEdit(row)">编辑</t-link>
+            <!-- <t-link theme="primary" @click="handleEdit(row)">编辑</t-link> -->
             <t-link theme="primary" @click="handleDelete(row)">删除</t-link>
           </t-space>
         </template>
@@ -43,22 +56,19 @@
 <script lang="tsx" setup>
 import {
   DialogPlugin,
-  type SelectProps,
   type PrimaryTableCol,
   type TableRowData,
   type TdBaseTableProps,
-  type TableProps,
   MessagePlugin,
 } from 'tdesign-vue-next';
 import { reactive, onMounted, ref } from 'vue';
-import { useFormatDate } from '@/hooks';
-
+import * as XLSX from 'xlsx';
 import { DEFAULT_PAGE_PARAMS, USER_STATUS } from '@/constants';
-import { getUserList, editUserStatus } from '@/api/user';
+// import { getUserList, editUserStatus } from '@/api/user';
 
 import EditDialog from './EditDialog.vue';
 const fileInputRef = ref<HTMLInputElement | null>(null);
-
+const importedData = ref<TableRowData[]>([]);
 interface FormData {
   id: string;
   username: string;
@@ -85,29 +95,19 @@ const COLUMNS: PrimaryTableCol[] = [
     colKey: 'id',
   },
   {
-    title: '对话风格',
-    ellipsis: true,
-    colKey: 'id',
-  },
-  {
-    title: '博主账号',
+    title: '用户名',
     ellipsis: true,
     colKey: 'username',
   },
   {
-    title: '评论数量',
+    title: '密码',
     ellipsis: true,
-    colKey: 'status',
+    colKey: 'password',
   },
   {
-    title: '点赞数量',
+    title: '昵称',
     ellipsis: true,
-    colKey: 'channelCode',
-  },
-  {
-    title: '评论规则',
-    ellipsis: true,
-    colKey: 'channelCode',
+    colKey: 'nickname',
   },
   {
     title: '操作',
@@ -127,41 +127,56 @@ const handleImport = () => {
 };
 //导入处理
 const handleFileChange = (event: Event) => {
+  console.log('导入文件event:', event);
   const files = (event.target as HTMLInputElement).files;
-  console.log('导入文件:', files);
+  console.log('导入文件files:', files);
   if (files && files.length > 0) {
     const file = files[0];
     const reader = new FileReader();
     reader.onload = e => {
-      const content = e.target?.result;
-      MessagePlugin.success('文件导入成功');
-      // 这里可以处理文件内容或上传到后端
+      const data = new Uint8Array(e.target?.result as ArrayBuffer);
+      console.log('导入文件data:', data);
+      const workbook = XLSX.read(data, { type: 'array' });
+      console.log('导入文件workbook:', workbook);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json<TableRowData>(worksheet);
+      importedData.value = jsonData.map((item: TableRowData, idx: number) => ({
+        id: item.id || idx + 1000, // 避免与原有数据冲突
+        username: item.username || '',
+        password: item.password || '',
+        nickname: item.nickname || '',
+      }));
+      MessagePlugin.success('Excel导入成功');
     };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
+  } else {
+    MessagePlugin.warning('请选择文件');
+    return;
   }
 };
-const tableData = ref<TableRowData[]>([{ id: 1, status: '已开启' }, { status: '未开启' }]);
+// const handleFileChange = (event: Event) => {
+//   const files = (event.target as HTMLInputElement).files;
+//   console.log('导入文件:', files);
+//   if (files && files.length > 0) {
+//     const file = files[0];
+//     const reader = new FileReader();
+//     reader.onload = e => {
+//       const content = e.target?.result;
+//       MessagePlugin.success('文件导入成功');
+//       // 这里可以处理文件内容或上传到后端
+//     };
+//     reader.readAsText(file);
+//   }
+// };
+const tableData = ref<TableRowData[]>([
+  { id: 1, username: '张三', password: '123456', nickname: '三哥', status: '已开启' },
+  { id: 2, username: '李四', password: '654321', nickname: '四姐', status: '未开启' },
+]);
 const handleCreate = (row: TableRowData) => {
   // 新建逻辑
   editDialogRef.value.open(row);
 };
-const handleEdit = (row: TableRowData) => {
-  // 编辑逻辑
-  editDialogRef.value.open(row);
-};
-
-// 确认弹窗
-const confirmVisible = ref(false);
-
-const defaultOperation = {
-  content: '',
-  bannedStatus: 0,
-  freezeStatus: 0,
-};
-// 弹窗名称
-const operations = reactive({
-  ...defaultOperation,
-});
 
 // 查询
 const handleQuery = () => {
@@ -194,13 +209,17 @@ const handleDelete = (row: TableRowData) => {
     },
   });
 };
-
-// 分页变化
-// const onPageChange: TableProps['onChange'] = async (changeParams, triggerAndData) => {
-//   //   const { current } = changeParams.pagination;
-//   //   fetchDataList(current);
-// };
-
+//导入数据提交给后台
+const submitData = async () => {
+  try {
+    console.log('提交的数据:', importedData.value);
+    // await sendExcelData(importedData.value); // 发送到后台
+    MessagePlugin.success('数据已提交到后台');
+    importedData.value = [];
+  } catch (e) {
+    MessagePlugin.error('提交失败');
+  }
+};
 // 请求数据
 const fetchDataList = async (page: number = pagination.value.defaultCurrent) => {
   // const { data } = await getUserList({

@@ -55,7 +55,14 @@ const appendNewRoute = () => {
     meta: { title },
     name,
   } = route;
-  tabsRouterStore.appendTabRouterList({ path, query, title: title as string, name, isAlive: true, meta: route.meta });
+  tabsRouterStore.appendTabRouterList({
+    path,
+    query,
+    title: title as string,
+    name,
+    isAlive: true,
+    meta: route.meta,
+  });
 };
 
 onMounted(() => {
@@ -67,7 +74,7 @@ watch(
   () => {
     appendNewRoute();
     document.querySelector(`.${prefix}-layout`).scrollTo({ top: 0, behavior: 'smooth' });
-  },
+  }
 );
 </script>
 <style lang="less" scoped></style>

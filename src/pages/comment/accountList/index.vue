@@ -19,18 +19,14 @@
 <script lang="tsx" setup>
 import {
   DialogPlugin,
-  type SelectProps,
   type PrimaryTableCol,
   type TableRowData,
   type TdBaseTableProps,
-  type TableProps,
-  MessagePlugin,
 } from 'tdesign-vue-next';
 import { reactive, onMounted, ref } from 'vue';
-import { useFormatDate } from '@/hooks';
 
 import { DEFAULT_PAGE_PARAMS, USER_STATUS } from '@/constants';
-import { getUserList, editUserStatus } from '@/api/user';
+// import { getUserList, editUserStatus } from '@/api/user';
 
 import EditDialog from './EditDialog.vue';
 interface FormData {
@@ -107,26 +103,8 @@ const handleEdit = (row: TableRowData) => {
   editDialogRef.value.open(row);
 };
 
-// 确认弹窗
-const confirmVisible = ref(false);
-
-const defaultOperation = {
-  content: '',
-  bannedStatus: 0,
-  freezeStatus: 0,
-};
-// 弹窗名称
-const operations = reactive({
-  ...defaultOperation,
-});
-
 // 查询
 const handleQuery = () => {
-  // fetchDataList();
-};
-// 重置
-const handleReset = () => {
-  formData.value = { ...searchForm };
   // fetchDataList();
 };
 
@@ -151,12 +129,6 @@ const handleDelete = (row: TableRowData) => {
     },
   });
 };
-
-// 分页变化
-// const onPageChange: TableProps['onChange'] = async (changeParams, triggerAndData) => {
-//   //   const { current } = changeParams.pagination;
-//   //   fetchDataList(current);
-// };
 
 // 请求数据
 const fetchDataList = async (page: number = pagination.value.defaultCurrent) => {

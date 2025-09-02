@@ -1,38 +1,5 @@
 <template>
   <div class="user-list-container">
-    <!-- <t-form :data="formData" :label-width="80">
-      <t-row>
-        <t-col :span="10">
-          <t-row :gutter="[24, 24]">
-            <t-col :span="4">
-              <t-form-item label="平台" name="status">
-                <t-select v-model="formData.status" placeholder="选择平台">
-                  <t-option
-                    v-for="op in USER_STATUS"
-                    :key="op.text"
-                    :label="op.text"
-                    :value="op.value"
-                  ></t-option>
-                </t-select>
-              </t-form-item>
-            </t-col>
-            <t-col :span="4">
-              <t-form-item label="用户名" name="phone">
-                <t-input
-                  v-model="formData.phone"
-                  class="form-item-content"
-                  placeholder="输入用户名"
-                />
-              </t-form-item>
-            </t-col>
-          </t-row>
-        </t-col>
-        <t-col :span="2" class="operation-container">
-          <t-button theme="primary" @click="handleQuery"> 查询 </t-button>
-          <t-button theme="default" @click="handleReset"> 重置 </t-button>
-        </t-col>
-      </t-row>
-    </t-form> -->
     <t-row :style="{ marginTop: 'var(--td-comp-margin-xxl)' }">
       <t-button theme="primary" @click="handleCreate"> 新建 </t-button>
     </t-row>
@@ -53,18 +20,14 @@
 <script lang="tsx" setup>
 import {
   DialogPlugin,
-  type SelectProps,
   type PrimaryTableCol,
   type TableRowData,
   type TdBaseTableProps,
-  type TableProps,
-  MessagePlugin,
 } from 'tdesign-vue-next';
 import { reactive, onMounted, ref } from 'vue';
-import { useFormatDate } from '@/hooks';
 
 import { DEFAULT_PAGE_PARAMS, USER_STATUS } from '@/constants';
-import { getUserList, editUserStatus } from '@/api/user';
+// import { getUserList, editUserStatus } from '@/api/user';
 
 import EditDialog from './EditDialog.vue';
 interface FormData {
@@ -141,29 +104,6 @@ const handleEdit = (row: TableRowData) => {
   editDialogRef.value.open(row);
 };
 
-// 确认弹窗
-const confirmVisible = ref(false);
-
-const defaultOperation = {
-  content: '',
-  bannedStatus: 0,
-  freezeStatus: 0,
-};
-// 弹窗名称
-const operations = reactive({
-  ...defaultOperation,
-});
-
-// 查询
-const handleQuery = () => {
-  // fetchDataList();
-};
-// 重置
-const handleReset = () => {
-  formData.value = { ...searchForm };
-  // fetchDataList();
-};
-
 // 删除
 const handleDelete = (row: TableRowData) => {
   const dialog = DialogPlugin.confirm({
@@ -185,12 +125,6 @@ const handleDelete = (row: TableRowData) => {
     },
   });
 };
-
-// 分页变化
-// const onPageChange: TableProps['onChange'] = async (changeParams, triggerAndData) => {
-//   //   const { current } = changeParams.pagination;
-//   //   fetchDataList(current);
-// };
 
 // 请求数据
 const fetchDataList = async (page: number = pagination.value.defaultCurrent) => {

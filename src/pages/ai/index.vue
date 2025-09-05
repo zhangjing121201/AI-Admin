@@ -6,23 +6,14 @@
           <t-row :gutter="[24, 24]">
             <t-col :span="4">
               <t-form-item label="平台" name="status">
-                <t-select v-model="formData.status" placeholder="选择平台">
-                  <t-option
-                    v-for="op in USER_STATUS"
-                    :key="op.text"
-                    :label="op.text"
-                    :value="op.value"
-                  ></t-option>
+                <t-select v-model="formData.platform" placeholder="选择平台">
+                  <t-option v-for="op in USER_STATUS" :key="op.text" :label="op.text" :value="op.value"></t-option>
                 </t-select>
               </t-form-item>
             </t-col>
             <t-col :span="4">
-              <t-form-item label="用户名" name="phone">
-                <t-input
-                  v-model="formData.phone"
-                  class="form-item-content"
-                  placeholder="输入用户名"
-                />
+              <t-form-item label="用户名" name="username">
+                <t-input v-model="formData.username" class="form-item-content" placeholder="输入用户名" />
               </t-form-item>
             </t-col>
           </t-row>
@@ -37,8 +28,8 @@
       <t-button theme="primary" @click="handleCreate"> 新建 </t-button>
     </t-row>
     <div class="table-container">
-      <!-- @change="onPageChange" -->
-      <t-table hover :data="tableData" :columns="COLUMNS" row-key="id" :pagination="pagination">
+
+      <t-table hover :data="tableData" :columns="COLUMNS" row-key="id" :pagination="pagination" @change="onPageChange">
         <template #operation="{ row }">
           <t-space>
             <t-link theme="primary" @click="handleEdit(row)">编辑</t-link>
@@ -64,21 +55,17 @@ import { reactive, onMounted, ref } from 'vue';
 import { useFormatDate } from '@/hooks';
 
 import { DEFAULT_PAGE_PARAMS, USER_STATUS } from '@/constants';
-import { getUserList, editUserStatus } from '@/api/user';
+import { getAiList, delAi } from '@/api/ai';
 
 import EditDialog from './EditDialog.vue';
 interface FormData {
-  id: string;
   username: string;
-  phone: string;
-  status: string;
+  platform: string;
 }
 
 const searchForm = {
-  id: '',
   username: '',
-  phone: '',
-  status: '',
+  platform: ''
 };
 const formData = ref<FormData>({ ...searchForm });
 const editDialogRef = ref<InstanceType<typeof EditDialog>>();
@@ -96,7 +83,7 @@ const COLUMNS: PrimaryTableCol[] = [
   {
     title: '平台',
     ellipsis: true,
-    colKey: 'id',
+    colKey: 'platform',
   },
   {
     title: '用户名',
@@ -106,17 +93,17 @@ const COLUMNS: PrimaryTableCol[] = [
   {
     title: '密码',
     ellipsis: true,
-    colKey: 'status',
+    colKey: 'password',
   },
   {
     title: '主页地址',
     ellipsis: true,
-    colKey: 'channelCode',
+    colKey: 'homepage_url',
   },
   {
     title: '对话风格',
     ellipsis: true,
-    colKey: 'channelCode',
+    colKey: 'conversation_style',
   },
   {
     title: '操作',
@@ -156,7 +143,9 @@ const operations = reactive({
 
 // 查询
 const handleQuery = () => {
-  // fetchDataList();
+  console.log(formData.value, 'formDataformData');
+
+  fetchDataList();
 };
 // 重置
 const handleReset = () => {
@@ -169,15 +158,13 @@ const handleDelete = (row: TableRowData) => {
   const dialog = DialogPlugin.confirm({
     theme: 'danger',
     header: '确认删除',
-    body: `您确定要删除 ${row.name} 吗？`,
+    body: `您确定要删除 ${row.username} 吗？`,
     confirmBtn: '确认',
     cancelBtn: '取消',
     onConfirm: async () => {
-      // 执行删除操作
-      console.log('删除分类:', row);
-      //   const res = await delCategory({ id: row?.id });
-      //   MessagePlugin.success(res.message);
-      //   fetchDataList();
+      const res = await delAi(row.id);
+      MessagePlugin.success('删除成功');
+      fetchDataList();
       dialog.destroy();
     },
     onCancel: () => {
@@ -187,25 +174,31 @@ const handleDelete = (row: TableRowData) => {
 };
 
 // 分页变化
-// const onPageChange: TableProps['onChange'] = async (changeParams, triggerAndData) => {
-//   //   const { current } = changeParams.pagination;
-//   //   fetchDataList(current);
-// };
+const onPageChange: TableProps['onChange'] = async (changeParams, triggerAndData) => {
+  const { current } = changeParams.pagination;
+  fetchDataList(current);
+};
 
 // 请求数据
 const fetchDataList = async (page: number = pagination.value.defaultCurrent) => {
-  // const { data } = await getUserList({
-  //   ...formData.value,
-  //   page,
-  //   size: pagination.value.defaultPageSize,
-  // });
-  // tableData.value = data.data;
-  // pagination.value.total = data.total;
-  // pagination.value.current = page;
+  let params = {
+    ...formData.value,
+    page,
+    page_size: pagination.value.defaultPageSize,
+  }
+  const { data } = await getAiList(params);
+  console.log(data, 'data1111');
+
+  tableData.value = data;
+  pagination.value.total = data.pagination.count;
+  pagination.value.current = data.pagination.page;
+
+
+
 };
 
 onMounted(() => {
-  // fetchDataList();
+  fetchDataList();
 });
 </script>
 

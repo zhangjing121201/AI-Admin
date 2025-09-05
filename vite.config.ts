@@ -43,7 +43,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
     ],
 
     server: {
-      port: 3002,
+      port: 8000,
       host: '0.0.0.0',
       proxy: {
         [VITE_API_URL_PREFIX]: {

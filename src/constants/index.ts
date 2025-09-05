@@ -58,23 +58,29 @@ export const GENDER = {
 // 用户状态
 export const USER_STATUS = {
   0: {
-    text: '正常',
-    theme: 'success',
-    value: '0'
+    text: '闪圈',
+    theme: '闪圈',
+    value: 'shanquan'
   },
   1: {
-    text: '禁言',
-    theme: 'danger',
-    value: '1'
+    text: 'TikTok',
+    theme: 'TikTok',
+    value: 'TikTok'
   },
+
   2: {
-    text: '冻结',
-    theme: 'danger',
-    value: '2'
+    text: 'Twitter',
+    theme: 'Twitter',
+    value: 'Twitter'
   },
-  3: {
-    text: '其他',
-    theme: 'warning',
-    value: '3'
+  3:{
+    text:'Instagram',
+     theme: 'Instagram',
+    value: 'Instagram'
   },
+  4:{
+     text:'其他',
+     theme: 'other',
+    value: 'other'
+  }
 };

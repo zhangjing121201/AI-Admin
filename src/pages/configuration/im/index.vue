@@ -19,6 +19,7 @@
 <script lang="tsx" setup>
 import {
   DialogPlugin,
+  MessagePlugin,
   type PrimaryTableCol,
   type TableRowData,
   type TdBaseTableProps,
@@ -26,7 +27,7 @@ import {
 import { reactive, onMounted, ref } from 'vue';
 
 import { DEFAULT_PAGE_PARAMS, USER_STATUS } from '@/constants';
-// import { getUserList, editUserStatus } from '@/api/user';
+import { getImConfigList, deleteImConfig } from '@/api/im';
 
 import EditDialog from './EditDialog.vue';
 interface FormData {
@@ -37,12 +38,12 @@ interface FormData {
 }
 
 const searchForm = {
-  id: '',
-  username: '',
-  phone: '',
-  status: '',
+  // id: '',
+  // username: '',
+  // phone: '',
+  // status: '',
 };
-const formData = ref<FormData>({ ...searchForm });
+// const formData = ref<FormData>({ ...searchForm });
 const editDialogRef = ref<InstanceType<typeof EditDialog>>();
 
 // 更新操作 id
@@ -58,7 +59,7 @@ const COLUMNS: PrimaryTableCol[] = [
   {
     title: 'AI 用户名',
     ellipsis: true,
-    colKey: 'id',
+    colKey: 'ai_account_username',
   },
   {
     title: '主页地址',
@@ -68,22 +69,22 @@ const COLUMNS: PrimaryTableCol[] = [
   {
     title: '回复风格',
     ellipsis: true,
-    colKey: 'status',
+    colKey: 'reply_style',
   },
   {
     title: '回复提示词',
     ellipsis: true,
-    colKey: 'channelCode',
+    colKey: 'reply_prompt',
   },
   {
     title: '历史范围',
     ellipsis: true,
-    colKey: 'channelCode',
+    colKey: 'history_range',
   },
   {
     title: '查询周期',
     ellipsis: true,
-    colKey: 'channelCode',
+    colKey: 'query_cycle',
   },
   {
     title: '操作',
@@ -94,7 +95,7 @@ const COLUMNS: PrimaryTableCol[] = [
 const pagination = ref<TdBaseTableProps['pagination']>({
   ...DEFAULT_PAGE_PARAMS,
   onChange: (pageInfo: { current: number; pageSize: number }) => {
-    // fetchDataList(pageInfo.current);
+    fetchDataList(pageInfo.current);
   },
 });
 
@@ -110,18 +111,18 @@ const handleEdit = (row: TableRowData) => {
 
 // 删除
 const handleDelete = (row: TableRowData) => {
+  console.log('删除分类:', row.id);
   const dialog = DialogPlugin.confirm({
     theme: 'danger',
     header: '确认删除',
-    body: `您确定要删除 ${row.name} 吗？`,
+    body: `您确定要删除 ${row.ai_account_username}的IM配置吗？`,
     confirmBtn: '确认',
     cancelBtn: '取消',
     onConfirm: async () => {
       // 执行删除操作
-      console.log('删除分类:', row);
-      //   const res = await delCategory({ id: row?.id });
-      //   MessagePlugin.success(res.message);
-      //   fetchDataList();
+      const res = await deleteImConfig(row?.id);
+      MessagePlugin.success('删除成功');
+      fetchDataList();
       dialog.destroy();
     },
     onCancel: () => {
@@ -132,18 +133,18 @@ const handleDelete = (row: TableRowData) => {
 
 // 请求数据
 const fetchDataList = async (page: number = pagination.value.defaultCurrent) => {
-  // const { data } = await getUserList({
-  //   ...formData.value,
-  //   page,
-  //   size: pagination.value.defaultPageSize,
-  // });
-  // tableData.value = data.data;
-  // pagination.value.total = data.total;
-  // pagination.value.current = page;
+  const { data } = await getImConfigList({
+    // ...formData.value,
+    page,
+    size: pagination.value.defaultPageSize,
+  });
+  tableData.value = data;
+  pagination.value.total = data.total;
+  pagination.value.current = page;
 };
 
 onMounted(() => {
-  // fetchDataList();
+  fetchDataList();
 });
 </script>
 
